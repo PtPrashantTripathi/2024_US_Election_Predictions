@@ -5,34 +5,36 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches:
-      - main  # Trigger deployment on pushes to the main branch
+      - main
+  workflow_dispatch:
 
 jobs:
-  build:
+  deploy:
+    # Environment configuration for GitHub Pages deployment
+    environment:
+      name: github-pages
+      url: https://ptprashanttripathi.github.io/2024_US_Election_Predictions/
+
+    # Use the latest stable Ubuntu runner
     runs-on: ubuntu-latest
 
     steps:
-      # Check out the repository
+      # Step 1: Checkout the repository
       - name: Checkout repository
-        uses: actions/checkout@v3
-
-      # Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+        uses: actions/checkout@v4
         with:
-          node-version: '16'  # Use Node.js 16 or any version compatible with your app
+          fetch-depth: 1  # Limit fetch to improve job speed
 
-      # Install dependencies
+      # Step 2: Set up Node.js environment
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'latest'
+
+      # Step 3: Install dependencies
       - name: Install dependencies
         run: npm install
 
-      # Build the React app
-      - name: Build project
-        run: npm run build
-
-      # Deploy to GitHub Pages
-      - name: Deploy to GitHub Pages
-        uses: peaceiris/actions-gh-pages@v3
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: ./build
+      # Step 4: deploy the React app
+      - name: deploy project
+        run: npm run deploy

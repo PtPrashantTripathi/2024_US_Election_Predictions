@@ -3,38 +3,65 @@
 name: Deploy to GitHub Pages
 
 on:
-  push:
-    branches:
-      - main
-  workflow_dispatch:
+    push:
+        branches:
+            - main
+    workflow_dispatch:
+
+# Set permissions for the GITHUB_TOKEN to read content and deploy to GitHub Pages
+permissions:
+    contents: read # Read access to repository content
+    pages: write # Write access to GitHub Pages
+    id-token: write # ID token for secure Pages deployment
+
+# Ensure only one deployment runs at a time and do not cancel in-progress jobs
+concurrency:
+    group: pages-deployments
+    cancel-in-progress: false
 
 jobs:
-  deploy:
-    # Environment configuration for GitHub Pages deployment
-    environment:
-      name: github-pages
-      url: https://ptprashanttripathi.github.io/2024_US_Election_Predictions/
+    deploy:
+        # Environment configuration for GitHub Pages deployment
+        environment:
+            name: github-pages
+            url: ${{ steps.deployment.outputs.page_url }}
 
-    # Use the latest stable Ubuntu runner
-    runs-on: ubuntu-latest
+        # Use the latest stable Ubuntu runner
+        runs-on: ubuntu-latest
 
-    steps:
-      # Step 1: Checkout the repository
-      - name: Checkout repository
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 1  # Limit fetch to improve job speed
+        steps:
+            # Step 1: Checkout the repository
+            - name: Checkout repository
+              uses: actions/checkout@v4
+              with:
+                  fetch-depth: 1 # Limit fetch to improve job speed
 
-      # Step 2: Set up Node.js environment
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 'latest'
+            # Step 2: Setup Pages for deployment
+            - name: Setup GitHub Pages
+              uses: actions/configure-pages@v5
 
-      # Step 3: Install dependencies
-      - name: Install dependencies
-        run: npm install
+            # Step 3: Set up Node.js environment
+            - name: Set up Node.js
+              uses: actions/setup-node@v4
+              with:
+                  node-version: "latest"
 
-      # Step 4: deploy the React app
-      - name: deploy project
-        run: npm run deploy
+            # Step 4: Install dependencies
+            - name: Install dependencies
+              run: npm install
+
+            # Step 5: build the React app
+            - name: build project
+              run: npm run build
+
+            # Step 6: Upload static site content from 'BUILD' directory as an artifact
+            - name: Upload static site content
+              uses: actions/upload-pages-artifact@v3
+              with:
+                  path: "./build" # Path to build static files
+                  retention-days: 5 # Retain artifacts for 5 days
+
+            # Step 7: Deploy the uploaded artifact to GitHub Pages
+            - name: Deploy to GitHub Pages
+              id: deployment
+              uses: actions/deploy-pages@v4

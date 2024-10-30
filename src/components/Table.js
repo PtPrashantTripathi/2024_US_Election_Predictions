@@ -1,13 +1,6 @@
 // src/components/Table.js
-
-import data from "./data";
-const Table = () => {
+function Table({ data }) {
     return (
-        <div className="container mx-auto py-8">
-            <h1 className="text-3xl font-bold text-center mb-6">
-                2024 Election Predictions
-            </h1>
-            <div className="overflow-x-auto">
                 <table className="min-w-full bg-white shadow-md rounded-lg">
                     <thead>
                         <tr>
@@ -45,9 +38,7 @@ const Table = () => {
                         ))}
                     </tbody>
                 </table>
-            </div>
-        </div>
     );
-};
+}
 
 export default Table;

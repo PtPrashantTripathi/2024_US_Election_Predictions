@@ -1,3 +1,4 @@
+import React from 'react'
 // src/components/Table.js
 function Table({ data }) {
     return (
